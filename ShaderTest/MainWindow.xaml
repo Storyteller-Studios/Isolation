@@ -1,0 +1,24 @@
+﻿<Window x:Class="ShaderTest.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ShaderTest" 
+        mc:Ignorable="d"
+        Title="MainWindow" Height="550" Width="550">
+    <Grid x:Name="LayoutRoot">
+        <Grid.Resources>
+            <Storyboard x:Key="TimeAnimation">
+                <DoubleAnimation From="0" To="62.836" Duration="0:1:0" RepeatBehavior="Forever"
+                                 Storyboard.TargetName="MyEffect" Storyboard.TargetProperty="Time" />
+            </Storyboard>
+        </Grid.Resources>
+        <Grid>
+            <Grid>
+                <Rectangle x:Name="Retangle1">
+
+                </Rectangle>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

@@ -11,9 +11,9 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Color = System.Windows.Media.Color;
 using ColorThiefDotNet;
-using PaletteMixr;
+using Color = System.Windows.Media.Color;
+using Brush = System.Windows.Media.Brush;
 
 namespace ShaderTest
 {
@@ -25,18 +25,50 @@ namespace ShaderTest
         public MainWindow()
         {
             InitializeComponent();
-            Loaded += (s, a) =>
+            Loaded += async (s, a) =>
             {
-                SetColor();
-                //((Storyboard)LayoutRoot.Resources["TimeAnimation"]).Begin();
+                var colorBrush = await CreateColorBrushAsync();
+                ((IsolationBrushProvider)LayoutRoot.Resources["BrushProvider"]).Background = colorBrush;
             };
         }
-        public Task SetColor()
+
+        public async Task<Brush> CreateColorBrushAsync()
         {
-            var thief = new ColorThief();
-            using var image = new Bitmap(@"C:\Users\21945\Pictures\illust_112988473_20231103_170358.png");
-            var sourceColor = thief.GetPalette(image, 5, 10, false);
-            var result = sourceColor.Select(x=>x.Color).ToList();
+            const int MaxSize = 100;
+
+            var result = await Task.Run(() =>
+            {
+                var thief = new ColorThief();
+
+                Bitmap? originalImage = null;
+                Bitmap? scaledImage = null;
+
+                try
+                {
+                    originalImage = new Bitmap(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "sample.jpg"));
+
+                    if (originalImage.Width > MaxSize || originalImage.Height > MaxSize)
+                    {
+                        var scale = Math.Max(originalImage.Width, originalImage.Height) * 1.0 / MaxSize;
+                        
+                        if (scale > 1)
+                        {
+                            scaledImage = new Bitmap(originalImage, (int)(originalImage.Width / scale), (int)(originalImage.Height / scale));
+                        }
+                    }
+
+                    var sourceColor = thief.GetPalette(scaledImage ?? originalImage, 5, 10, false);
+                    return sourceColor.Select(x => x.Color).ToArray();
+                }
+                finally
+                {
+                    originalImage?.Dispose();
+                    scaledImage?.Dispose();
+                }
+
+
+            });
+
             var brush = new LinearGradientBrush()
             {
                 GradientStops = new()
@@ -44,29 +76,29 @@ namespace ShaderTest
                     new()
                     {
                         Offset = 0,
-                        Color=Color.FromArgb(result[2].A,result[2].R,result[2].G,result[2].B)
+                        Color = MapColor(result[2])
                     },
                     new()
                     {
                         Offset = 0.25,
-                        Color=Color.FromArgb(result[0].A,result[0].R,result[0].G,result[0].B)
-
+                        Color = MapColor(result[0])
                     },
                     new()
                     {
                         Offset = 0.5,
-                        Color=Color.FromArgb(result[1].A,result[1].R,result[1].G,result[1].B)
+                        Color = MapColor(result[1])
                     },
                     new()
                     {
                         Offset = 0.75,
-                        Color=Color.FromArgb(result[3].A,result[3].R,result[3].G,result[3].B)
+                        Color = MapColor(result[3])
                     }
 
                 }
             };
-            Retangle1.Fill = brush;
-            return Task.CompletedTask;
+            return brush;
+
+            static Color MapColor(ColorThiefDotNet.Color color) => Color.FromArgb(color.A, color.R, color.G, color.B);
         }
     }
 }

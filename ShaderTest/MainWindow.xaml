@@ -8,16 +8,11 @@
         Title="MainWindow" Height="550" Width="550">
     <Grid x:Name="LayoutRoot">
         <Grid.Resources>
-            <Storyboard x:Key="TimeAnimation">
-                <DoubleAnimation From="0" To="62.836" Duration="0:1:0" RepeatBehavior="Forever"
-                                 Storyboard.TargetName="MyEffect" Storyboard.TargetProperty="Time" />
-            </Storyboard>
+            <local:IsolationBrushProvider x:Key="BrushProvider"/>
         </Grid.Resources>
         <Grid>
             <Grid>
-                <Rectangle x:Name="Retangle1">
-
-                </Rectangle>
+                <Rectangle Fill="{Binding Source={StaticResource BrushProvider},Path=IsolationBrush}" />
             </Grid>
         </Grid>
     </Grid>

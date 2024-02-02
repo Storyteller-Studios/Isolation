@@ -57,7 +57,7 @@ namespace ShaderTest
                         }
                     }
 
-                    var sourceColor = thief.GetPalette(scaledImage ?? originalImage, 5, 10, false);
+                    var sourceColor = thief.GetPalette(scaledImage ?? originalImage, 4, 10, false);
                     return sourceColor.Select(x => x.Color).ToArray();
                 }
                 finally
@@ -69,9 +69,19 @@ namespace ShaderTest
 
             });
 
-            var brush = new LinearGradientBrush()
+            var brush = new LinearGradientBrush();
+            if(result.Length < 3)
             {
-                GradientStops = new()
+                GradientStopCollection collection = new();
+                for(int i = 1;  i<result.Length; i++ )
+                {
+                    collection.Add(new() { Color = MapColor(result[i]), Offset = i/result.Length });
+                }
+                brush.GradientStops = collection;
+            }
+            else
+            {
+                brush.GradientStops = new()
                 {
                     new()
                     {
@@ -85,17 +95,11 @@ namespace ShaderTest
                     },
                     new()
                     {
-                        Offset = 0.5,
-                        Color = MapColor(result[1])
-                    },
-                    new()
-                    {
                         Offset = 0.75,
-                        Color = MapColor(result[3])
+                        Color = MapColor(result[1])
                     }
-
-                }
-            };
+                };
+            }
             return brush;
 
             static Color MapColor(ColorThiefDotNet.Color color) => Color.FromArgb(color.A, color.R, color.G, color.B);

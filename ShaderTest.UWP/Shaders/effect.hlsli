@@ -31,7 +31,7 @@ float4 draw_image(in float2 uv)
     float nX = f_noise((uv * nXAmp));
     float nYAmp = (((cos((_iTime * speed)) + 1.0) * 0.5) * power);
     float nY = f_noise((uv * nYAmp));
-    float2 uv2 = float2(nX, nY);
+    float2 uv2 = float2(nX, nY) + uv;
     
     float2 mirroredUV = abs(frac(uv2 - 0.5) - 0.5) * 2;
 

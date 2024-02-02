@@ -1,9 +1,10 @@
-Texture2D<float4> InputTexture0; 
-SamplerState InputSampler0;
+#define D2D_INPUT_COUNT 1
+#define D2D_INPUT0_COMPLEX
+#include "d2d1effecthelpers.hlsli"
 
 float _iTime = 0.5;
 float2 _iScale = float2(0.5,0.5);
-float _iPower = 3.0;
+float _iPower = 3;
 
 float f_random(in float2 _st)
 {
@@ -30,18 +31,16 @@ float4 draw_image(in float2 uv)
     float nX = f_noise((uv * nXAmp));
     float nYAmp = (((cos((_iTime * speed)) + 1.0) * 0.5) * power);
     float nY = f_noise((uv * nYAmp));
-    float2 uv2 = float2(nX, nY) + uv;
+    float2 uv2 = float2(nX, nY);
+    
     float2 mirroredUV = abs(frac(uv2 - 0.5) - 0.5) * 2;
-    return InputTexture0.Sample(InputSampler0, mirroredUV);  
+
+    return D2DSampleInput(0, mirroredUV);
 }
 
-export float4 main(
-    float4 pos   : SV_POSITION,   
-    float4 posScene : SCENE_POSITION,    
-    float4 uv0  : TEXCOORD0 
-    ) : SV_Target 
+D2D_PS_ENTRY(main)
 {
-    float2 uv = uv0.xy;
+    float2 uv = D2DGetInputCoordinate(0).xy;
 	float2 scale = float2(_iScale.x * 3, _iScale.y * 2.1781 + 0.0389);
 	if(scale.x < 0.1) scale.x = 0.1;
 	return draw_image(uv / scale);

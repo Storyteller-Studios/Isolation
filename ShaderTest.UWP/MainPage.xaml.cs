@@ -65,7 +65,6 @@ namespace ShaderTest.UWP
                 
                 using (var stream = await file.OpenReadAsync())
                 {
-                    stops = new CanvasGradientStop[3];
                     var thief = new ColorThief();
                     var decoder = await BitmapDecoder.CreateAsync(stream);
                     var mainColorPattern = (await thief.GetColor(decoder,10,false)).IsDark;
@@ -73,22 +72,39 @@ namespace ShaderTest.UWP
                         .OrderBy(t=>t.Population)
                         .Where(t=>t.IsDark == mainColorPattern)
                         .Select(t=> Windows.UI.Color.FromArgb(t.Color.A,t.Color.R,t.Color.G,t.Color.B)).ToList();
-                    stops[0] = new CanvasGradientStop()
+                    if (colors.Count < 3)
                     {
-                        Position = 0,
-                        Color = colors[1]
-                    };
-                    stops[1] = new CanvasGradientStop()
+                        stops = new CanvasGradientStop[colors.Count];
+                        for(int i = 0; i<colors.Count; i++)
+                        {
+                            stops[i] = new CanvasGradientStop()
+                            {
+                                Position = i / colors.Count,
+                                Color = colors[i]
+                            };
+                        }
+                    }
+                    else
                     {
-                        Position = 0.25f,
-                        Color = colors[0]
-                    };
-                    stops[2] = new CanvasGradientStop()
-                    {
-                        Position = 0.75f,
-                        Color = colors[2]
-                    };
-                    target = new CanvasRenderTarget(canvas, 1000, 1000);
+                        stops = new CanvasGradientStop[3];
+                        stops[0] = new CanvasGradientStop()
+                        {
+                            Position = 0,
+                            Color = colors[1]
+                        };
+                        stops[1] = new CanvasGradientStop()
+                        {
+                            Position = 0.25f,
+                            Color = colors[0]
+                        };
+                        stops[2] = new CanvasGradientStop()
+                        {
+                            Position = 0.75f,
+                            Color = colors[2]
+                        };
+                        target = new CanvasRenderTarget(canvas, 1000, 1000);
+                    }
+                    
                 }
             };
             canvas.Update += (s, e) =>

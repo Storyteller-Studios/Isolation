@@ -10,7 +10,8 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <canvas:CanvasAnimatedControl Name="Canvas"/>
-        <Button x:Name="selectPicture"/>
+        <canvas:CanvasAnimatedControl Name="canvas">
+        </canvas:CanvasAnimatedControl>
+        <Button x:Name="selectPicture" Content="Select Image"/>
     </Grid>
 </Page>

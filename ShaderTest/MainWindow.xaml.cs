@@ -56,8 +56,10 @@ namespace ShaderTest
                             scaledImage = new Bitmap(originalImage, (int)(originalImage.Width / scale), (int)(originalImage.Height / scale));
                         }
                     }
-
-                    var sourceColor = thief.GetPalette(scaledImage ?? originalImage, 4, 10, false);
+                    var mainColorPattern = thief.GetColor(scaledImage ?? originalImage, 10, false).IsDark;
+                    var sourceColor = thief.GetPalette(scaledImage ?? originalImage, 8, 10, false)
+                        .Where(t=>t.IsDark == mainColorPattern)
+                        .OrderBy(t => t.Population);
                     return sourceColor.Select(x => x.Color).ToArray();
                 }
                 finally

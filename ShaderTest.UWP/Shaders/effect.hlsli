@@ -1,40 +1,15 @@
-sampler2D input : register(s0);
+#define D2D_REQUIRES_SCENE_POSITION
+#define D2D_INPUT_COUNT 0
+#include "d2d1effecthelpers.hlsli"
 
-/// <summary>iResolution</summary>
-/// <minValue>0,0,0/minValue>
-/// <maxValue>1,1,1</maxValue>
-/// <defaultValue>1,1,1</defaultValue>
-float3 iResolution : register(c0);
-
-/// <summary>iTime</summary>
-/// <minValue>0/minValue>
-/// <maxValue>1000</maxValue>
-/// <defaultValue>0</defaultValue>
-float iTime : register(c1);
-
-/// <summary>color1</summary>
-/// <minValue>0,0,0/minValue>
-/// <maxValue>1,1,1</maxValue>
-/// <defaultValue>.957, .804, .623</defaultValue>
-float3 color1 : register(c2);
-
-/// <summary>color2</summary>
-/// <minValue>0,0,0/minValue>
-/// <maxValue>1,1,1</maxValue>
-/// <defaultValue>.192, .384, .933</defaultValue>
-float3 color2 : register(c3);
-
-/// <summary>color3</summary>
-/// <minValue>0,0,0/minValue>
-/// <maxValue>1,1,1</maxValue>
-/// <defaultValue>.910, .510, .8</defaultValue>
-float3 color3 : register(c4);
-
-/// <summary>color4</summary>
-/// <minValue>0,0,0/minValue>
-/// <maxValue>1,1,1</maxValue>
-/// <defaultValue>0.350, .71, .953</defaultValue>
-float3 color4 : register(c5);
+float3 iResolution = float3(1,1,1);
+float iTime = 0.0;
+float3 color1 = float3(0.957,0.804,0.623);
+float3 color2 = float3(0.192,0.384,0.933);
+float3 color3 = float3(0.910,0.510,0.8);
+float3 color4 = float3(0.350,0.71,0.953);
+float Width = 800;
+float Height = 800;
 
 float2x2 f_Rot(in float _a)
 {
@@ -57,9 +32,9 @@ float f_noise(in float2 _p)
 }
 
 
-float4 main(float2 uv : TEXCOORD) : COLOR
-{
-    float2 _uv5678 = uv;
+D2D_PS_ENTRY(main)
+{ 
+    float2 _uv5678 = float2(D2DGetScenePosition().x / Width, D2DGetScenePosition().y / Height);
     float _ratio5679 = iResolution.x / iResolution.y;
     float2 _tuv5680 = _uv5678;
     (_tuv5680 -= 0.5);
@@ -67,8 +42,8 @@ float4 main(float2 uv : TEXCOORD) : COLOR
     (_tuv5680.y *= (1.0 / _ratio5679));
     (_tuv5680 = mul(_tuv5680, transpose(f_Rot(radians((((_degree5681 - 0.5) * 720.0) + 180.0))))));
     (_tuv5680.y *= _ratio5679);
-    float _frequency5682 = { 5.0 };
-    float _amplitude5683 = { 30.0 };
+    float _frequency5682 = {5.0};
+    float _amplitude5683 = {30.0};
     float _speed5684 = (iTime * 2.0);
     (_tuv5680.x += (sin(((_tuv5680.y * _frequency5682) + _speed5684)) / _amplitude5683));
     (_tuv5680.y += (sin((((_tuv5680.x * _frequency5682) * 1.5) + _speed5684)) / (_amplitude5683 * 0.5)));

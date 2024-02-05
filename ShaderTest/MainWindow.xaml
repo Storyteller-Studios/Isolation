@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ShaderTest" 
+        xmlns:effects="clr-namespace:ShaderTest.Effects" 
         mc:Ignorable="d"
         Title="MainWindow" Height="550" Width="550">
     <Grid x:Name="LayoutRoot">

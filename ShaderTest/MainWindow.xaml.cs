@@ -1,19 +1,7 @@
-﻿using System.Drawing;
-using System.IO;
-using System.Text;
+﻿using ColorThiefDotNet;
+using System.Drawing;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using ColorThiefDotNet;
-using Color = System.Windows.Media.Color;
-using Brush = System.Windows.Media.Brush;
+using System.Windows.Media.Media3D;
 
 namespace ShaderTest
 {
@@ -27,12 +15,15 @@ namespace ShaderTest
             InitializeComponent();
             Loaded += async (s, a) =>
             {
-                var colorBrush = await CreateColorBrushAsync();
-                ((IsolationBrushProvider)LayoutRoot.Resources["BrushProvider"]).Background = colorBrush;
+                var colors = await CreateColorBrushAsync();
+                ((IsolationBrushProvider)LayoutRoot.Resources["BrushProvider"]).Color1 = colors[0];
+                ((IsolationBrushProvider)LayoutRoot.Resources["BrushProvider"]).Color2 = colors[1];
+                ((IsolationBrushProvider)LayoutRoot.Resources["BrushProvider"]).Color3 = colors[2];
+                ((IsolationBrushProvider)LayoutRoot.Resources["BrushProvider"]).Color4 = colors[3];
             };
         }
 
-        public async Task<Brush> CreateColorBrushAsync()
+        public async Task<Point3D[]> CreateColorBrushAsync()
         {
             const int MaxSize = 100;
 
@@ -50,55 +41,25 @@ namespace ShaderTest
                     if (originalImage.Width > MaxSize || originalImage.Height > MaxSize)
                     {
                         var scale = Math.Max(originalImage.Width, originalImage.Height) * 1.0 / MaxSize;
-                        
+
                         if (scale > 1)
                         {
                             scaledImage = new Bitmap(originalImage, (int)(originalImage.Width / scale), (int)(originalImage.Height / scale));
                         }
                     }
-
-                    var sourceColor = thief.GetPalette(scaledImage ?? originalImage, 5, 10, false);
-                    return sourceColor.Select(x => x.Color).ToArray();
+                    var mainColorPattern = thief.GetColor(scaledImage ?? originalImage, 10, false).IsDark;
+                    var sourceColor = thief.GetPalette(scaledImage ?? originalImage, 8, 10, false)
+                        .Where(t => t.IsDark == mainColorPattern)
+                        .OrderBy(t => t.Population);
+                    return sourceColor.Select(color => new Point3D((float)color.Color.R / 255, (float)color.Color.G / 255, (float)color.Color.B / 255)).ToArray();
                 }
                 finally
                 {
                     originalImage?.Dispose();
                     scaledImage?.Dispose();
                 }
-
-
             });
-
-            var brush = new LinearGradientBrush()
-            {
-                GradientStops = new()
-                {
-                    new()
-                    {
-                        Offset = 0,
-                        Color = MapColor(result[2])
-                    },
-                    new()
-                    {
-                        Offset = 0.25,
-                        Color = MapColor(result[0])
-                    },
-                    new()
-                    {
-                        Offset = 0.5,
-                        Color = MapColor(result[1])
-                    },
-                    new()
-                    {
-                        Offset = 0.75,
-                        Color = MapColor(result[3])
-                    }
-
-                }
-            };
-            return brush;
-
-            static Color MapColor(ColorThiefDotNet.Color color) => Color.FromArgb(color.A, color.R, color.G, color.B);
+            return result;
         }
     }
 }

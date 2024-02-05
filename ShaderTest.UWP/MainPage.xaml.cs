@@ -3,26 +3,15 @@ using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
 using Microsoft.Graphics.Canvas.Effects;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices.WindowsRuntime;
-using System.Timers;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
-using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 
 // https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x804 上介绍了“空白页”项模板
 
@@ -38,12 +27,29 @@ namespace ShaderTest.UWP
         public GaussianBlurEffect effectGaussianBlur;
         public CanvasGradientStop[] stops;
         public CanvasLinearGradientBrush brush;
+        public float width;
+        public float height;
         public float time = 0;
         public MainPage()
         {
             this.InitializeComponent();
             Init();
+            canvas.SizeChanged += Canvas_SizeChanged;
+            width = (float)canvas.ActualWidth;
+            height = (float)canvas.ActualHeight;
         }
+
+        private void Canvas_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            width = (float)canvas.ActualWidth;
+            height = (float)canvas.ActualHeight;
+            if (effect != null)
+            {
+                effect.Properties["Width"] = width;
+                effect.Properties["Height"] = height;
+            }
+        }
+
         public void Init()
         {
             canvas.CreateResources += async (s, e) =>
@@ -52,8 +58,8 @@ namespace ShaderTest.UWP
                 IBuffer buffer = await FileIO.ReadBufferAsync(file);
                 var bytes = buffer.ToArray();
                 effect = new PixelShaderEffect(bytes);
-                effectGaussianBlur = new GaussianBlurEffect();
-                effectGaussianBlur.BlurAmount = 50;
+                effect.Properties["Width"] = width;
+                effect.Properties["Height"] = height;
             };
             selectPicture.Click += async (s, e) =>
             {
@@ -62,76 +68,34 @@ namespace ShaderTest.UWP
                 filePicker.FileTypeFilter.Add(".jpg");
                 var file = await filePicker.PickSingleFileAsync();
                 if (file == null) return;
-                
+
                 using (var stream = await file.OpenReadAsync())
                 {
                     var thief = new ColorThief();
                     var decoder = await BitmapDecoder.CreateAsync(stream);
-                    var mainColorPattern = (await thief.GetColor(decoder,10,false)).IsDark;
+                    var mainColorPattern = (await thief.GetColor(decoder, 10, false)).IsDark;
                     var colors = (await thief.GetPalette(decoder, 8, 10, false))
-                        .OrderBy(t=>t.Population)
-                        .Where(t=>t.IsDark == mainColorPattern)
-                        .Select(t=> Windows.UI.Color.FromArgb(t.Color.A,t.Color.R,t.Color.G,t.Color.B)).ToList();
-                    if (colors.Count < 3)
-                    {
-                        stops = new CanvasGradientStop[colors.Count];
-                        for(int i = 0; i<colors.Count; i++)
-                        {
-                            stops[i] = new CanvasGradientStop()
-                            {
-                                Position = i / colors.Count,
-                                Color = colors[i]
-                            };
-                        }
-                    }
-                    else
-                    {
-                        stops = new CanvasGradientStop[3];
-                        stops[0] = new CanvasGradientStop()
-                        {
-                            Position = 0,
-                            Color = colors[1]
-                        };
-                        stops[1] = new CanvasGradientStop()
-                        {
-                            Position = 0.25f,
-                            Color = colors[0]
-                        };
-                        stops[2] = new CanvasGradientStop()
-                        {
-                            Position = 0.75f,
-                            Color = colors[2]
-                        };
-                        target = new CanvasRenderTarget(canvas, 1000, 1000);
-                    }
-                    
+                        .OrderBy(t => t.Population)
+                        .Where(t => t.IsDark == mainColorPattern)
+                        .Select(t => new Vector3((float)t.Color.R / 0xff, (float)t.Color.G / 0xff, (float)t.Color.B / 0xff)).ToList();
+                    effect.Properties["color1"] = colors[0];
+                    effect.Properties["color2"] = colors[1];
+                    effect.Properties["color3"] = colors[2];
+                    effect.Properties["color4"] = colors[3];
                 }
             };
             canvas.Update += (s, e) =>
             {
-                if (effect == null || stops == null)
+                if (effect == null)
                     return;
                 time = Convert.ToSingle(e.Timing.TotalTime.TotalSeconds);
-                s.Invalidate();
+                effect.Properties["iTime"] = time;
             };
             canvas.Draw += (s, e) =>
             {
-                if (effect == null || target == null)
+                if (effect == null)
                     return;
-                using (var session = target.CreateDrawingSession())
-                {
-                    using (var brush = new CanvasLinearGradientBrush(session, stops))
-                    {
-                        brush.StartPoint = new Vector2(0, 0);
-                        brush.EndPoint = new Vector2(1000, 1000);
-                        session.FillRectangle(new Rect(new Point(0, 0), new Point(1000, 1000)), brush);
-                    }
-                }
-                effect.Source1 = target;
-                effectGaussianBlur.Source = effect;
-                effect.Properties["_iTime"] = time;
-                e.DrawingSession.DrawImage(effectGaussianBlur);
-                e.DrawingSession.Dispose();
+                e.DrawingSession.DrawImage(effect);
             };
         }
     }

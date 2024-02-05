@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ShaderTest.Effects;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Effects;
+using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
 
 namespace ShaderTest
@@ -19,11 +13,11 @@ namespace ShaderTest
         static IsolationBrushProvider()
         {
             StretchProperty = TileBrush.StretchProperty.AddOwner(typeof(IsolationBrushProvider), new FrameworkPropertyMetadata(Stretch.UniformToFill));
-            SpeedRatioProperty = Timeline.SpeedRatioProperty.AddOwner(typeof(IsolationBrushProvider));
-
-            BackgroundProperty = DependencyProperty.Register("Background", typeof(Brush), typeof(IsolationBrushProvider), new PropertyMetadata(null));
-            EffectScaleProperty = DependencyProperty.Register("EffectScale", typeof(Point), typeof(IsolationBrushProvider), new PropertyMetadata(new Point(0.5d, 0.5d)));
-            EffectPowerProperty = DependencyProperty.Register("EffectPower", typeof(double), typeof(IsolationBrushProvider), new PropertyMetadata(3d));
+            IResolutionProperty = DependencyProperty.Register("EffectIResolution", typeof(Point3D), typeof(IsolationBrushProvider), new PropertyMetadata(new Point3D(1D, 1D, 1D)));
+            Color1Property = DependencyProperty.Register("EffectColor1", typeof(Point3D), typeof(IsolationBrushProvider), new PropertyMetadata(new Point3D(0.957D, 0.804D, 0.623D)));
+            Color2Property = DependencyProperty.Register("EffectColor2", typeof(Point3D), typeof(IsolationBrushProvider), new PropertyMetadata(new Point3D(0.192D, 0.384D, 0.933D)));
+            Color3Property = DependencyProperty.Register("EffectColor3", typeof(Point3D), typeof(IsolationBrushProvider), new PropertyMetadata(new Point3D(0.91D, 0.51D, 0.8D)));
+            Color4Property = DependencyProperty.Register("EffectColor4", typeof(Point3D), typeof(IsolationBrushProvider), new PropertyMetadata(new Point3D(0.35D, 0.71D, 0.953D)));
         }
 
         private Brush? isolationBrush;
@@ -31,41 +25,49 @@ namespace ShaderTest
 
         public Brush IsolationBrush => EnsureBrush();
 
-        public Brush Background
+        public Point3D IResolution
         {
-            get { return (Brush)GetValue(BackgroundProperty); }
-            set { SetValue(BackgroundProperty, value); }
+            get { return (Point3D)GetValue(IResolutionProperty); }
+            set { SetValue(IResolutionProperty, value); }
         }
         public Stretch Stretch
         {
             get { return (Stretch)GetValue(StretchProperty); }
             set { SetValue(StretchProperty, value); }
         }
-        public double SpeedRatio
+        public Point3D Color1
         {
-            get { return (double)GetValue(SpeedRatioProperty); }
-            set { SetValue(SpeedRatioProperty, value); }
+            get { return (Point3D)GetValue(Color1Property); }
+            set { SetValue(Color1Property, value); }
         }
-        public Point EffectScale
+        public Point3D Color2
         {
-            get { return (Point)GetValue(EffectScaleProperty); }
-            set { SetValue(EffectScaleProperty, value); }
+            get { return (Point3D)GetValue(Color2Property); }
+            set { SetValue(Color2Property, value); }
         }
-        public double EffectPower
+        public Point3D Color3
         {
-            get { return (double)GetValue(EffectPowerProperty); }
-            set { SetValue(EffectPowerProperty, value); }
+            get { return (Point3D)GetValue(Color3Property); }
+            set { SetValue(Color3Property, value); }
+        }
+        public Point3D Color4
+        {
+            get { return (Point3D)GetValue(Color4Property); }
+            set { SetValue(Color4Property, value); }
         }
 
-        public static readonly DependencyProperty BackgroundProperty;
+        public static readonly DependencyProperty IResolutionProperty;
+
+        public static readonly DependencyProperty Color1Property;
+
+        public static readonly DependencyProperty Color2Property;
+
+        public static readonly DependencyProperty Color3Property;
+
+        public static readonly DependencyProperty Color4Property;
 
         public static readonly DependencyProperty StretchProperty;
 
-        public static readonly DependencyProperty SpeedRatioProperty;
-
-        public static readonly DependencyProperty EffectScaleProperty;
-
-        public static readonly DependencyProperty EffectPowerProperty;
 
         private Brush EnsureBrush()
         {
@@ -77,12 +79,13 @@ namespace ShaderTest
                     Height = 1
                 };
 
-                var effect = new MyShaderEffect();
+                var effect = new GradientColorEffect();
+                brushHost.Fill = new SolidColorBrush(Colors.White);
                 brushHost.Effect = effect;
 
                 isolationBrush = new VisualBrush(brushHost);
 
-                var animation = new DoubleAnimation(0, 62.836, TimeSpan.FromMinutes(1))
+                var animation = new DoubleAnimation(0, 60, TimeSpan.FromMinutes(1))
                 {
                     RepeatBehavior = RepeatBehavior.Forever,
                 };
@@ -90,12 +93,13 @@ namespace ShaderTest
                 // 锁定到30帧以降低资源消耗
                 Timeline.SetDesiredFrameRate(animation, 30);
 
-                effect.BeginAnimation(MyShaderEffect.TimeProperty, animation);
+                effect.BeginAnimation(GradientColorEffect.ITimeProperty, animation);
 
-                SetBinding("EffectScale", effect, MyShaderEffect.ScaleProperty);
-                SetBinding("EffectPower", effect, MyShaderEffect.PowerProperty);
-                SetBinding("SpeedRatio", animation, Timeline.SpeedRatioProperty);
-                SetBinding("Background", brushHost, Shape.FillProperty);
+                SetBinding("EffectIResolution", effect, GradientColorEffect.IResolutionProperty);
+                SetBinding("EffectColor1", effect, GradientColorEffect.Color1Property);
+                SetBinding("EffectColor2", effect, GradientColorEffect.Color2Property);
+                SetBinding("EffectColor3", effect, GradientColorEffect.Color3Property);
+                SetBinding("EffectColor4", effect, GradientColorEffect.Color4Property);
                 SetBinding("Stretch", isolationBrush, TileBrush.StretchProperty);
             }
 

@@ -1,60 +1,80 @@
 sampler2D input : register(s0);
 
-/// <summary>_iTime</summary>
-/// <minValue>0</minValue>
-/// <maxValue>100</maxValue>
-/// <defaultValue>0.5</defaultValue>
-float _iTime : register(c1);
+/// <summary>iResolution</summary>
+/// <minValue>0,0,0/minValue>
+/// <maxValue>1,1,1</maxValue>
+/// <defaultValue>1,1,1</defaultValue>
+float3 iResolution : register(c0);
 
-/// <summary>_iScale</summary>
-/// <minValue>0,0</minValue>
-/// <maxValue>5,5</maxValue>
-/// <defaultValue>0.5,0.5</defaultValue>
-float2 _iScale : register(c2);
+/// <summary>iTime</summary>
+/// <minValue>0/minValue>
+/// <maxValue>1000</maxValue>
+/// <defaultValue>0</defaultValue>
+float iTime : register(c1);
 
-/// <summary>_iPower</summary>
-/// <minValue>1.0</minValue>
-/// <maxValue>5.0</maxValue>
-/// <defaultValue>3.0</defaultValue>
-float _iPower: register(c3);
+/// <summary>color1</summary>
+/// <minValue>0,0,0/minValue>
+/// <maxValue>1,1,1</maxValue>
+/// <defaultValue>.957, .804, .623</defaultValue>
+float3 color1 : register(c2);
 
-float f_random(in float2 _st)
+/// <summary>color2</summary>
+/// <minValue>0,0,0/minValue>
+/// <maxValue>1,1,1</maxValue>
+/// <defaultValue>.192, .384, .933</defaultValue>
+float3 color2 : register(c3);
+
+/// <summary>color3</summary>
+/// <minValue>0,0,0/minValue>
+/// <maxValue>1,1,1</maxValue>
+/// <defaultValue>.910, .510, .8</defaultValue>
+float3 color3 : register(c4);
+
+/// <summary>color4</summary>
+/// <minValue>0,0,0/minValue>
+/// <maxValue>1,1,1</maxValue>
+/// <defaultValue>0.350, .71, .953</defaultValue>
+float3 color4 : register(c5);
+
+float2x2 f_Rot(in float _a)
 {
-    return frac((sin(dot(_st.xy, float2(12.9898, 78.233002))) * 43758.547));
+    float _s = sin(_a);
+    float _c = cos(_a);
+    return float2x2(_c, (-_s), _s, _c);
+}
+float2 f_hash(in float2 _p)
+{
+    (_p = float2(dot(_p, float2(2127.1001, 81.169998)), dot(_p, float2(1269.5, 283.37))));
+    return frac((sin(_p) * 43758.547));
+}
+float f_noise(in float2 _p)
+{
+    float2 _i = floor(_p);
+    float2 _f = frac(_p);
+    float2 _u = ((_f * _f) * (3.0 - (2.0 * _f)));
+    float _n = lerp(lerp(dot((-1.0 + (2.0 * f_hash((_i + float2(0.0, 0.0))))), (_f - float2(0.0, 0.0))), dot((-1.0 + (2.0 * f_hash((_i + float2(1.0, 0.0))))), (_f - float2(1.0, 0.0))), _u.x), lerp(dot((-1.0 + (2.0 * f_hash((_i + float2(0.0, 1.0))))), (_f - float2(0.0, 1.0))), dot((-1.0 + (2.0 * f_hash((_i + float2(1.0, 1.0))))), (_f - float2(1.0, 1.0))), _u.x), _u.y);
+    return (0.5 + (0.5 * _n));
 }
 
-float f_noise(in float2 _st)
-{
-    float2 i = floor(_st);
-    float2 f = frac(_st);
-    float a = f_random(i);
-    float b = f_random((i + float2(1.0, 0.0)));
-    float c = f_random((i + float2(0.0, 1.0)));
-    float d = f_random((i + float2(1.0, 1.0)));
-    float2 u = ((f * f) * (3.0 - (2.0 * f)));
-    return ((lerp(a, b, u.x) + (((c - a) * u.y) * (1.0 - u.x))) + (((d - b) * u.x) * u.y));
-}
 
-float4 draw_image(in float2 uv)
+float4 main(float2 uv : TEXCOORD) : COLOR
 {
-    float speed = 0.1;
-    float power = _iPower;
-    float nXAmp = (((sin((_iTime * speed)) + 1.0) * 0.5) * power);
-    float nX = f_noise((uv * nXAmp));
-    float nYAmp = (((cos((_iTime * speed)) + 1.0) * 0.5) * power);
-    float nY = f_noise((uv * nYAmp));
-    float2 uv2 = float2(nX, nY) + uv;
-    
-    float2 mirroredUV = abs(frac(uv2 - 0.5) - 0.5) * 2;
-
-    return tex2D(input, mirroredUV);
-}
-
-float4 main(float2 uv : TEXCOORD) : COLOR 
-{
-	float2 scale = float2(_iScale.x * 3, _iScale.y * 2.1781 + 0.0389);
-	
-	if(scale.x < 0.1) scale.x = 0.1;
-	
-	return draw_image(uv / scale);
+    float2 _uv5678 = uv;
+    float _ratio5679 = iResolution.x / iResolution.y;
+    float2 _tuv5680 = _uv5678;
+    (_tuv5680 -= 0.5);
+    float _degree5681 = f_noise(float2((iTime * 0.1), (_tuv5680.x * _tuv5680.y)));
+    (_tuv5680.y *= (1.0 / _ratio5679));
+    (_tuv5680 = mul(_tuv5680, transpose(f_Rot(radians((((_degree5681 - 0.5) * 720.0) + 180.0))))));
+    (_tuv5680.y *= _ratio5679);
+    float _frequency5682 = { 5.0 };
+    float _amplitude5683 = { 30.0 };
+    float _speed5684 = (iTime * 2.0);
+    (_tuv5680.x += (sin(((_tuv5680.y * _frequency5682) + _speed5684)) / _amplitude5683));
+    (_tuv5680.y += (sin((((_tuv5680.x * _frequency5682) * 1.5) + _speed5684)) / (_amplitude5683 * 0.5)));
+    float3 _layer15687 = lerp(color1, color2, smoothstep(-0.30000001, 0.2, mul(_tuv5680, transpose(f_Rot(-0.08726646))).x));
+    float3 _layer25690 = lerp(color3, color4, smoothstep(-0.30000001, 0.2, mul(_tuv5680, transpose(f_Rot(-0.08726646))).x));
+    float3 _finalComp5691 = lerp(_layer15687, _layer25690, smoothstep(0.5, -0.30000001, _tuv5680.y));
+    float3 _col5692 = _finalComp5691;
+    return float4(_col5692, 1.0);
 }

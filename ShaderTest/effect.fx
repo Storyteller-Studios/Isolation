@@ -56,6 +56,29 @@ float f_noise(in float2 _p)
     return (0.5 + (0.5 * _n));
 }
 
+float3 hsv2rgb(float3 c)
+{
+    float4 K = float4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+ 
+    float3 p = abs(frac(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * lerp(K.xxx, saturate(p - K.xxx), c.y);
+}
+
+float3 rgb2hsv(float3 c)
+{
+    float4 K = float4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    float4 p = lerp(float4(c.bg, K.wz), float4(c.gb, K.xy), step(c.b, c.g));
+    float4 q = lerp(float4(p.xyw, c.r), float4(c.r, p.yzx), step(p.x, c.r));
+
+    float d = q.x - min(q.w, q.y);
+    float e = 1.0e-10;
+    return float3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+
+float range(float val, float mi, float ma)
+{
+    return val * (ma - mi) + mi;
+}
 
 float4 main(float2 uv : TEXCOORD) : COLOR
 {
@@ -75,6 +98,22 @@ float4 main(float2 uv : TEXCOORD) : COLOR
     float3 _layer15687 = lerp(color1, color2, smoothstep(-0.30000001, 0.2, mul(_tuv5680, transpose(f_Rot(-0.08726646))).x));
     float3 _layer25690 = lerp(color3, color4, smoothstep(-0.30000001, 0.2, mul(_tuv5680, transpose(f_Rot(-0.08726646))).x));
     float3 _finalComp5691 = lerp(_layer15687, _layer25690, smoothstep(0.5, -0.30000001, _tuv5680.y));
-    float3 _col5692 = _finalComp5691;
-    return float4(_col5692, 1.0);
+    float3 hsv = rgb2hsv(_finalComp5691);
+
+    float2 p = -1.0 + 1.5 * uv.xy / iResolution.xy;
+    float t = iTime / 5.;
+    
+    float x = p.x;
+    float y = p.y;
+    
+    float mov0 = x + y + cos(sin(t) * 2.0) * 100. + sin(x / 100.) * 1000.;
+    float mov1 = y / 0.3 + t;
+    float mov2 = x / 0.2;
+    
+    float c1 = sin(mov1 + t) / 2. + mov2 / 2. - mov1 - mov2 + t;
+    float c2 = cos(c1 + sin(mov0 / 1000. + t) + sin(y / 40. + t) + sin((x + y) / 100.) * 3.);
+    float c3 = abs(sin(c2 + cos(mov1 + mov2 + c2) + cos(mov2) + sin(x / 1000.)));
+    
+    float3 col = hsv2rgb(float3(range(c2, hsv.x, hsv.x * 0.95), range(c3, hsv.y, hsv.y * 0.85), range(c3, hsv.z, hsv.z * 0.85)));
+    return float4(col, 1.0);
 }

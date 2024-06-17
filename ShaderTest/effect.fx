@@ -80,6 +80,12 @@ float range(float val, float mi, float ma)
     return val * (ma - mi) + mi;
 }
 
+float smoothstep_custom(float edge0, float edge1, float x)
+{
+    float t = clamp((x - edge0) / (edge1 - edge0), 0.0, 0.95);
+    return t * t * (3.0 - 2.0 * t);
+}
+
 float4 main(float2 uv : TEXCOORD) : COLOR
 {
     float2 _uv5678 = uv;
@@ -92,12 +98,12 @@ float4 main(float2 uv : TEXCOORD) : COLOR
     (_tuv5680.y *= _ratio5679);
     float _frequency5682 = { 5.0 };
     float _amplitude5683 = { 30.0 };
-    float _speed5684 = (iTime * 2.0);
+    float _speed5684 = (iTime * 0.8);
     (_tuv5680.x += (sin(((_tuv5680.y * _frequency5682) + _speed5684)) / _amplitude5683));
     (_tuv5680.y += (sin((((_tuv5680.x * _frequency5682) * 1.5) + _speed5684)) / (_amplitude5683 * 0.5)));
-    float3 _layer15687 = lerp(color1, color2, smoothstep(-0.30000001, 0.2, mul(_tuv5680, transpose(f_Rot(-0.08726646))).x));
-    float3 _layer25690 = lerp(color3, color4, smoothstep(-0.30000001, 0.2, mul(_tuv5680, transpose(f_Rot(-0.08726646))).x));
-    float3 _finalComp5691 = lerp(_layer15687, _layer25690, smoothstep(0.5, -0.30000001, _tuv5680.y));
+    float3 _layer15687 = lerp(color1, color2, smoothstep_custom(-0.30000001, 0.2, mul(_tuv5680, transpose(f_Rot(-0.08726646))).x));
+    float3 _layer25690 = lerp(color3, color4, smoothstep_custom(-0.30000001, 0.2, mul(_tuv5680, transpose(f_Rot(-0.08726646))).x));
+    float3 _finalComp5691 = lerp(_layer15687, _layer25690, smoothstep_custom(0.5, -0.30000001, _tuv5680.y));
     float3 hsv = rgb2hsv(_finalComp5691);
 
     float2 p = -1.0 + 1.5 * uv.xy / iResolution.xy;

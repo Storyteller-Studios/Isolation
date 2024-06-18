@@ -97,6 +97,6 @@ D2D_PS_ENTRY(main)
     float c2 = cos(c1+sin(mov0/1000.+t)+sin(y/40.+t)+sin((x+y)/100.)*3.);
 	float c3 = abs(sin(c2+cos(mov1+mov2+c2)+cos(mov2)+sin(x/1000.)));
     
-    float3 col = hsv2rgb(float3(range(c2 , hsv.x,  hsv.x * 0.95) , range(c3 , hsv.y, hsv.y * 0.85), range(c3 , hsv.z,  hsv.z * 0.85)));
+float3 col = hsv2rgb(float3(range(abs(c2), hsv.x * 0.95, hsv.x), range(c3, hsv.y, hsv.y * 0.85), range(c3, hsv.z, hsv.z * 0.85)));
     return float4(col, 1.0);
 }

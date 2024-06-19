@@ -20,8 +20,8 @@ float2x2 f_Rot(in float _a)
 
 float2 f_hash(in float2 _p)
 {
-    (_p = float2(dot(_p, float2(2127.1001, 81.169998)), dot(_p, float2(1269.5, 283.37))));
-    return frac((sin(_p) * 43758.547));
+    (_p = float2(dot(_p, float2(2127.1, 81.17)), dot(_p, float2(1269.5, 283.37))));
+    return frac((sin(_p) * 43758.5453));
 }
 
 float f_noise(in float2 _p)
@@ -59,44 +59,44 @@ float range(float val, float mi, float ma)
 
 float smoothstep_custom(float edge0, float edge1, float x)
 {
-    float t = clamp((x - edge0) / (edge1 - edge0), 0.0, 0.95);
+    float t = saturate((x - edge0) / (edge1 - edge0));
     return t * t * (3.0 - 2.0 * t);
 }
 
 D2D_PS_ENTRY(main)
 { 
-    float2 _uv5678 = float2(D2DGetScenePosition().x / Width, D2DGetScenePosition().y / Height);
-    float _ratio5679 = iResolution.x / iResolution.y;
-    float2 _tuv5680 = _uv5678;
-    (_tuv5680 -= 0.5);
-    float _degree5681 = f_noise(float2((iTime * 0.1), (_tuv5680.x * _tuv5680.y)));
-    (_tuv5680.y *= (1.0 / _ratio5679));
-    (_tuv5680 = mul(_tuv5680, transpose(f_Rot(radians((((_degree5681 - 0.5) * 720.0) + 180.0))))));
-    (_tuv5680.y *= _ratio5679);
-    float _frequency5682 = { 5.0 };
-    float _amplitude5683 = { 30.0 };
-    float _speed5684 = (iTime * 0.75);
-    (_tuv5680.x += (sin(((_tuv5680.y * _frequency5682) + _speed5684)) / _amplitude5683));
-    (_tuv5680.y += (sin((((_tuv5680.x * _frequency5682) * 1.5) + _speed5684)) / (_amplitude5683 * 0.5)));
-    float3 _layer15687 = lerp(color1, color2, smoothstep_custom(-0.30000001, 0.2, mul(_tuv5680, transpose(f_Rot(-0.08726646))).x));
-    float3 _layer25690 = lerp(color3, color4, smoothstep_custom(-0.30000001, 0.2, mul(_tuv5680, transpose(f_Rot(-0.08726646))).x));
-    float3 _finalComp5691 = lerp(_layer15687, _layer25690, smoothstep_custom(0.5, -0.30000001, _tuv5680.y));
-    float3 hsv = rgb2hsv(_finalComp5691);
+    float2 uv = float2(D2DGetScenePosition().x / Width, D2DGetScenePosition().y / Height);
+    float ratio = iResolution.x / iResolution.y;
+    float2 tuv = uv;
+    tuv -= 0.5;
+    float degree = f_noise(float2((iTime * 0.1), (tuv.x * tuv.y)));
+    tuv.y *= (1.0 / ratio);
+    tuv = mul(tuv, transpose(f_Rot(radians((((degree - 0.5) * 720.0) + 180.0)))));
+    tuv.y *= ratio;
+    float frequency = 5.0;
+    float amplitude = 25.0;
+    float speed = (iTime * 0.75);
+    tuv.x += (sin(((tuv.y * frequency) + speed)) / amplitude);
+    tuv.y += (sin((((tuv.x * frequency) * 1.5) + speed)) / (amplitude * 0.5));
+    float3 layer1 = lerp(color1, color2, smoothstep_custom(-0.3, 0.2, mul(tuv, transpose(f_Rot(radians(-5.0)))).x));
+    float3 layer2 = lerp(color3, color4, smoothstep_custom(-0.3, 0.2, mul(tuv, transpose(f_Rot(radians(-5.0)))).x));
+    float3 finalComp = lerp(layer1, layer2, smoothstep_custom(0.5, -0.3, tuv.y));
+    float3 hsv = rgb2hsv(finalComp);
 
-    float2 p = -1.0 + 1.5 * _uv5678.xy / iResolution.xy;
+    float2 p = -1.0 + 1.5 * uv.xy / iResolution.xy;
 	float t = iTime / 5.;
     
 	float x = p.x;
 	float y = p.y;
     
 	float mov0 = x+y+cos(sin(t)*2.0)*100.+sin(x/100.)*1000.;
-	float mov1 = y / 0.3 +  t;
+	float mov1 = y / 0.3 + t;
 	float mov2 = x / 0.2;
     
     float c1 = sin(mov1+t)/2.+mov2/2.-mov1-mov2+t;
     float c2 = cos(c1+sin(mov0/1000.+t)+sin(y/40.+t)+sin((x+y)/100.)*3.);
 	float c3 = abs(sin(c2+cos(mov1+mov2+c2)+cos(mov2)+sin(x/1000.)));
     
-float3 col = hsv2rgb(float3(range(abs(c2), hsv.x * 0.95, hsv.x), range(c3, hsv.y, hsv.y * 0.85), range(c3, hsv.z, hsv.z * 0.85)));
+    float3 col = hsv2rgb(float3(range(abs(c2), hsv.x * 0.95, hsv.x), range(c3, hsv.y, hsv.y * 0.85), range(c3, hsv.z, hsv.z * 0.85)));
     return float4(col, 1.0);
 }

@@ -28,13 +28,6 @@ namespace Isolation.Uwp
     public sealed partial class IsolationControl : UserControl
     {
         private PixelShaderEffect effect;
-        private CanvasRenderTarget target;
-        private GaussianBlurEffect effectGaussianBlur;
-        private CanvasGradientStop[] stops;
-        private CanvasLinearGradientBrush brush;
-        private float width;
-        private float height;
-        private float time = 0;
         
         public void SetColor(Vector3 color1, Vector3 color2, Vector3 color3, Vector3 color4)
         {
@@ -48,47 +41,55 @@ namespace Isolation.Uwp
         {
             this.InitializeComponent();
             this.Loaded += OnLoaded;
+            this.Unloaded += OnUnloaded;
+        }
+
+        private void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            MainCanvas.CreateResources -= MainCanvas_CreateResources;
+            MainCanvas.Update -= MainCanvas_Update;
+            MainCanvas.Draw -= MainCanvas_Draw;
+            MainCanvas.SizeChanged -= MainCanvas_SizeChanged;
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            Init();
+            MainCanvas.CreateResources += MainCanvas_CreateResources;
+            MainCanvas.Update += MainCanvas_Update;
+            MainCanvas.Draw += MainCanvas_Draw;
+            MainCanvas.SizeChanged += MainCanvas_SizeChanged;
         }
 
-        public void Init()
+
+        private void MainCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            if (effect is null) return;
+            effect.Properties["Width"] = (float)MainCanvas.ActualWidth;
+            effect.Properties["Height"] = (float)MainCanvas.ActualHeight;
+        }
 
-            MainCanvas.CreateResources += async (s, e) =>
-            {
-                StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Shaders/effect.bin"));
-                IBuffer buffer = await FileIO.ReadBufferAsync(file);
-                var bytes = buffer.ToArray();
-                effect = new PixelShaderEffect(bytes);
-                effect.Properties["Width"] = width;
-                effect.Properties["Height"] = height;
-            };
-            MainCanvas.Update += (s, e) =>
-            {
-                if (effect is null)
-                    return;
-                time = Convert.ToSingle(e.Timing.TotalTime.TotalSeconds);
-                effect.Properties["iTime"] = time;
-            };
-            MainCanvas.Draw += (s, e) =>
-            {
-                if (effect is null)
-                    return;
-                e.DrawingSession.DrawImage(effect);
-            };
-            MainCanvas.SizeChanged += (s, e) =>
-            {
-                if (effect is null) return;
-                width = (float)MainCanvas.ActualWidth;
-                height = (float)MainCanvas.ActualHeight;
-                effect.Properties["Width"] = width;
-                effect.Properties["Height"] = height;
-            };
+        private void MainCanvas_Draw(Microsoft.Graphics.Canvas.UI.Xaml.ICanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedDrawEventArgs args)
+        {
+            if (effect is null)
+                return;
+            args.DrawingSession.DrawImage(effect);
+        }
 
+        private void MainCanvas_Update(Microsoft.Graphics.Canvas.UI.Xaml.ICanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedUpdateEventArgs args)
+        {
+            if (effect is null)
+                return;
+            effect.Properties["iTime"] = Convert.ToSingle(args.Timing.TotalTime.TotalSeconds);
+        }
+
+        private async void MainCanvas_CreateResources(Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs args)
+        {
+            var file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Shaders/effect.bin"));
+            var buffer = await FileIO.ReadBufferAsync(file);
+            var bytes = buffer.ToArray();
+            effect = new PixelShaderEffect(bytes);
+            effect.Properties["Width"] = (float)MainCanvas.ActualWidth;
+            effect.Properties["Height"] = (float)MainCanvas.ActualHeight;
         }
     }
 }

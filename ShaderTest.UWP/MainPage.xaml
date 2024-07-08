@@ -11,7 +11,7 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <isolation:IsolationControl x:Name="IsolationBackground" Canvas.ZIndex="1"/>
-        <Button x:Name="SelectPictureButton" Content="Select Image"/>
+        <isolation:IsolationControl x:Name="IsolationBackground"/>
+        <Button x:Name="SelectPictureButton" Content="Select Image"  HorizontalAlignment="Center"/>
     </Grid>
 </Page>

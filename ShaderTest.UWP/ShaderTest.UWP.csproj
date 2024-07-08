@@ -161,14 +161,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\effect.bin">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Shaders\effect.fxlib">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Isolation.Uwp\Isolation.Uwp.csproj">
       <Project>{52dff1e6-7b94-44e6-9244-8817f04d654f}</Project>
       <Name>Isolation.Uwp</Name>

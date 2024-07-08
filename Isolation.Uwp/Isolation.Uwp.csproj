@@ -142,9 +142,9 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <None Include="Shaders\effect.bin">
+    <EmbeddedResource Include="Shaders\effect.bin">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </EmbeddedResource>
     <None Include="Shaders\effect.fxlib">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShaderTest", "ShaderTest\Sh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaderTest.UWP", "ShaderTest.UWP\ShaderTest.UWP.csproj", "{3B7AA151-73B9-4A8A-8C5F-4C9EE01F71CE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Isolation.Uwp", "Isolation.Uwp\Isolation.Uwp.csproj", "{52DFF1E6-7B94-44E6-9244-8817F04D654F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,26 @@ Global
 		{3B7AA151-73B9-4A8A-8C5F-4C9EE01F71CE}.Release|x86.ActiveCfg = Release|x86
 		{3B7AA151-73B9-4A8A-8C5F-4C9EE01F71CE}.Release|x86.Build.0 = Release|x86
 		{3B7AA151-73B9-4A8A-8C5F-4C9EE01F71CE}.Release|x86.Deploy.0 = Release|x86
+		{52DFF1E6-7B94-44E6-9244-8817F04D654F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52DFF1E6-7B94-44E6-9244-8817F04D654F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52DFF1E6-7B94-44E6-9244-8817F04D654F}.Debug|ARM.ActiveCfg = Debug|ARM
+		{52DFF1E6-7B94-44E6-9244-8817F04D654F}.Debug|ARM.Build.0 = Debug|ARM
+		{52DFF1E6-7B94-44E6-9244-8817F04D654F}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{52DFF1E6-7B94-44E6-9244-8817F04D654F}.Debug|ARM64.Build.0 = Debug|ARM64
+		{52DFF1E6-7B94-44E6-9244-8817F04D654F}.Debug|x64.ActiveCfg = Debug|x64
+		{52DFF1E6-7B94-44E6-9244-8817F04D654F}.Debug|x64.Build.0 = Debug|x64
+		{52DFF1E6-7B94-44E6-9244-8817F04D654F}.Debug|x86.ActiveCfg = Debug|x86
+		{52DFF1E6-7B94-44E6-9244-8817F04D654F}.Debug|x86.Build.0 = Debug|x86
+		{52DFF1E6-7B94-44E6-9244-8817F04D654F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52DFF1E6-7B94-44E6-9244-8817F04D654F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52DFF1E6-7B94-44E6-9244-8817F04D654F}.Release|ARM.ActiveCfg = Release|ARM
+		{52DFF1E6-7B94-44E6-9244-8817F04D654F}.Release|ARM.Build.0 = Release|ARM
+		{52DFF1E6-7B94-44E6-9244-8817F04D654F}.Release|ARM64.ActiveCfg = Release|ARM64
+		{52DFF1E6-7B94-44E6-9244-8817F04D654F}.Release|ARM64.Build.0 = Release|ARM64
+		{52DFF1E6-7B94-44E6-9244-8817F04D654F}.Release|x64.ActiveCfg = Release|x64
+		{52DFF1E6-7B94-44E6-9244-8817F04D654F}.Release|x64.Build.0 = Release|x64
+		{52DFF1E6-7B94-44E6-9244-8817F04D654F}.Release|x86.ActiveCfg = Release|x86
+		{52DFF1E6-7B94-44E6-9244-8817F04D654F}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

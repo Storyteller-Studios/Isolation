@@ -6,12 +6,12 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:canvas ="using:Microsoft.Graphics.Canvas.UI.Xaml"
+    xmlns:isolation="using:Isolation.Uwp"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <canvas:CanvasAnimatedControl Name="canvas">
-        </canvas:CanvasAnimatedControl>
-        <Button x:Name="selectPicture" Content="Select Image"/>
+        <isolation:IsolationControl x:Name="IsolationBackground"/>
+        <Button x:Name="SelectPictureButton" Content="Select Image"  HorizontalAlignment="Center"/>
     </Grid>
 </Page>

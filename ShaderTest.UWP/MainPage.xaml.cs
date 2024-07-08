@@ -34,34 +34,13 @@ namespace ShaderTest.UWP
         {
             this.InitializeComponent();
             Init();
-            canvas.SizeChanged += Canvas_SizeChanged;
-            width = (float)canvas.ActualWidth;
-            height = (float)canvas.ActualHeight;
         }
 
-        private void Canvas_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            width = (float)canvas.ActualWidth;
-            height = (float)canvas.ActualHeight;
-            if (effect != null)
-            {
-                effect.Properties["Width"] = width;
-                effect.Properties["Height"] = height;
-            }
-        }
+
 
         public void Init()
         {
-            canvas.CreateResources += async (s, e) =>
-            {
-                StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(new Uri("ms-appx:///Shaders/effect.bin"));
-                IBuffer buffer = await FileIO.ReadBufferAsync(file);
-                var bytes = buffer.ToArray();
-                effect = new PixelShaderEffect(bytes);
-                effect.Properties["Width"] = width;
-                effect.Properties["Height"] = height;
-            };
-            selectPicture.Click += async (s, e) =>
+            SelectPictureButton.Click += async (s, e) =>
             {
                 var filePicker = new FileOpenPicker();
                 filePicker.FileTypeFilter.Add(".png");
@@ -78,24 +57,8 @@ namespace ShaderTest.UWP
                         .OrderBy(t => t.Population)
                         .Where(t => t.IsDark == mainColorPattern)
                         .Select(t => new Vector3((float)t.Color.R / 0xff, (float)t.Color.G / 0xff, (float)t.Color.B / 0xff)).ToList();
-                    effect.Properties["color1"] = colors[0];
-                    effect.Properties["color2"] = colors[1];
-                    effect.Properties["color3"] = colors[2];
-                    effect.Properties["color4"] = colors[3];
+                    IsolationBackground.SetColor(colors[0], colors[1], colors[2],colors[3]);
                 }
-            };
-            canvas.Update += (s, e) =>
-            {
-                if (effect == null)
-                    return;
-                time = Convert.ToSingle(e.Timing.TotalTime.TotalSeconds);
-                effect.Properties["iTime"] = time;
-            };
-            canvas.Draw += (s, e) =>
-            {
-                if (effect == null)
-                    return;
-                e.DrawingSession.DrawImage(effect);
             };
         }
     }

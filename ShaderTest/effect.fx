@@ -36,6 +36,30 @@ float3 color3 : register(c4);
 /// <defaultValue>0.350, .71, .953</defaultValue>
 float3 color4 : register(c5);
 
+/// <summary>EnableLightWave</summary>
+/// <minValue>0/minValue>
+/// <maxValue>1</maxValue>
+/// <defaultValue>1</defaultValue>
+float EnableLightWave : register(c6);
+
+/// <summary>RandomValue1</summary>
+/// <minValue>-100/minValue>
+/// <maxValue>100</maxValue>
+/// <defaultValue>0</defaultValue>
+float RandomValue1 : register(c7);
+
+/// <summary>RandomValue2</summary>
+/// <minValue>-100/minValue>
+/// <maxValue>100</maxValue>
+/// <defaultValue>0</defaultValue>
+float RandomValue2 : register(c8);
+
+/// <summary>RandomValue3</summary>
+/// <minValue>-100/minValue>
+/// <maxValue>100</maxValue>
+/// <defaultValue>0</defaultValue>
+float RandomValue3 : register(c9);
+
 float2x2 f_Rot(in float _a)
 {
     float _s = sin(_a);
@@ -105,22 +129,29 @@ float4 main(float2 uv : TEXCOORD) : COLOR
     float3 layer1 = lerp(color1, color2, smoothstep_custom(-0.3, 0.2, mul(tuv, transpose(f_Rot(radians(-5.0)))).x));
     float3 layer2 = lerp(color3, color4, smoothstep_custom(-0.3, 0.2, mul(tuv, transpose(f_Rot(radians(-5.0)))).x));
     float3 finalComp = lerp(layer1, layer2, smoothstep_custom(0.5, -0.3, tuv.y));
-    float3 hsv = rgb2hsv(finalComp);
+    if (EnableLightWave == 0.0)
+    {
+        return float4(finalComp, 1.0);
+    }
+    else
+    {
+        float3 hsv = rgb2hsv(finalComp);
 
-    float2 p = -1.0 + 1.5 * uv.xy / iResolution.xy;
-	float t = iTime / 5.;
-    
-	float x = p.x;
-	float y = p.y;
-    
-	float mov0 = x+y+cos(sin(t)*2.0)*100.+sin(x/100.)*1000.;
-	float mov1 = y / 0.3 + t;
-	float mov2 = x / 0.2;
-    
-    float c1 = sin(mov1+t)/2.+mov2/2.-mov1-mov2+t;
-    float c2 = cos(c1+sin(mov0/1000.+t)+sin(y/40.+t)+sin((x+y)/100.)*3.);
-	float c3 = abs(sin(c2+cos(mov1+mov2+c2)+cos(mov2)+sin(x/1000.)));
-    
-    float3 col = hsv2rgb(float3(range(abs(c2), hsv.x * 0.95, hsv.x), range(c3, hsv.y, hsv.y * 0.85), range(c3, hsv.z, hsv.z * 0.85)));
-    return float4(col, 1.0);
+        float2 p = -1.0 + 1.5 * uv.xy / iResolution.xy;
+        float t = iTime / 5.;
+
+        float x = p.x;
+        float y = p.y;
+
+        float mov0 = x + y + cos(sin(t) * 2.0) * 100. + sin(x / 100.) * 1000.;
+        float mov1 = y / 0.3 + t;
+        float mov2 = x / 0.2;
+
+        float c1 = sin(mov1 + t + RandomValue1) / 2. + mov2 / 2. - mov1 - mov2 + t;
+        float c2 = cos(c1 + sin(mov0 / 1000. + t - RandomValue2) + sin(y / 40. + t + RandomValue3) + sin((x + y) / 100.) * 3.);
+        float c3 = abs(sin(c2 + cos(mov1 + mov2 + c2) + cos(mov2) + sin(x / 1000.)));
+
+        float3 col = hsv2rgb(float3(range(abs(c2), hsv.x * 0.95, hsv.x), range(c3, hsv.y, hsv.y * 0.85), range(c3, hsv.z, hsv.z * 0.85)));
+        return float4(col, 1.0);
+    }
 }

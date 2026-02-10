@@ -13,6 +13,7 @@ float Height = 800;
 float RandomValue1 = 0;
 float RandomValue2 = 0;
 float RandomValue3 = 0;
+bool UseHSVBlending = false;
 //Shader Utilities
 float2x2 f_Rot(in float _a)
 {
@@ -71,12 +72,30 @@ D2D_PS_ENTRY(main)
     float speed = (iTime * 0.75);
     tuv.x += (sin(((tuv.y * frequency) + speed)) / amplitude);
     tuv.y += (sin((((tuv.x * frequency) * 1.5) + speed)) / (amplitude * 0.5));
-    float3 c1 = rgb2hsv(color1);
-    float3 c2 = rgb2hsv(color2);
-    float3 c3 = rgb2hsv(color3);
-    float3 c4 = rgb2hsv(color4);
+    float3 c1,c2,c3,c4;
+    if(UseHSVBlending)
+    {
+        c1 = rgb2hsv(color1);
+        c2 = rgb2hsv(color2);
+        c3 = rgb2hsv(color3);
+        c4 = rgb2hsv(color4);
+    }
+    else
+    {
+        c1 = color1;
+        c2 = color2;
+        c3 = color3;
+        c4 = color4;
+    }
     float3 layer1 = lerp(c1, c2, smoothstep(-0.3, 0.2, mul(tuv, transpose(f_Rot(radians(-5.0)))).x));
     float3 layer2 = lerp(c3, c4, smoothstep(-0.3, 0.2, mul(tuv, transpose(f_Rot(radians(-5.0)))).x));
     float3 finalComp = lerp(layer1, layer2, smoothstep(0.5, -0.3, tuv.y));
-    return float4(hsv2rgb(finalComp), 1.0);
+    if(UseHSVBlending)
+    {
+        return float4(hsv2rgb(finalComp), 1.0);
+    }
+    else
+    {
+        return float4(finalComp, 1.0);
+    }
 }

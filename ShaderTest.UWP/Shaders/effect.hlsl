@@ -2,18 +2,17 @@
 #define D2D_INPUT_COUNT 0
 #include "d2d1effecthelpers.hlsli"
 
-float3 iResolution = float3(1,1,1);
+float2 iResolution = float2(800,800);
 float iTime = 0.0;
 float3 color1 = float3(0.957,0.804,0.623);
 float3 color2 = float3(0.192,0.384,0.933);
 float3 color3 = float3(0.910,0.510,0.8);
 float3 color4 = float3(0.350,0.71,0.953);
-float Width = 800;
-float Height = 800;
 float RandomValue1 = 0;
 float RandomValue2 = 0;
 float RandomValue3 = 0;
 bool UseHSVBlending = false;
+bool EnableLightWave = false;
 //Shader Utilities
 float2x2 f_Rot(in float _a)
 {
@@ -38,6 +37,7 @@ float range(float val, float mi, float ma)
 {
     return val * (ma - mi) + mi;
 }
+
 // Color Utilities
 float3 hsv2rgb(float3 c)
 {
@@ -57,16 +57,32 @@ float3 rgb2hsv(float3 c)
     return float3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
 }
 
+float3 lightwave(float3 input, bool isHSV, float2 uv){
+    float3 hsv = isHSV ? input : rgb2hsv(input);
+    float2 p = -1.0 + 1.5 * uv.xy;
+    float t = iTime / 5.;
+    float x = p.x;
+    float y = p.y;
+
+    float mov0 = x+y+cos(sin(t)*2.0)*100.+sin(x/100.)*1000.;
+    float mov1 = y / 0.3 + t;
+    float mov2 = x / 0.2;
+
+    float c1 = sin(mov1+t + RandomValue1)/2.+mov2/2.-mov1-mov2+t;
+    float c2 = cos(c1+sin(mov0/1000.+t - RandomValue2)+sin(y/40.+t + RandomValue3)+sin((x+y)/100.)*3.);
+    float c3 = abs(sin(c2+cos(mov1+mov2+c2)+cos(mov2)+sin(x/1000.)));
+
+    float3 col = hsv2rgb(float3(range(abs(c2), hsv.x * 0.95, hsv.x), range(c3, hsv.y, hsv.y * 0.85), range(c3, hsv.z, hsv.z * 0.85)));
+    return col;  
+}
+
 D2D_PS_ENTRY(main)
 { 
-    float2 uv = float2(D2DGetScenePosition().x / Width, D2DGetScenePosition().y / Height);
-    float ratio = iResolution.x / iResolution.y;
+    float2 uv = float2(D2DGetScenePosition().x / iResolution.x, D2DGetScenePosition().y / iResolution.y);
     float2 tuv = uv;
     tuv -= 0.5;
     float degree = f_noise(float2((iTime * 0.1), (tuv.x * tuv.y)));
-    tuv.y *= (1.0 / ratio);
     tuv = mul(tuv, transpose(f_Rot(radians((((degree - 0.5) * 720.0) + 180.0)))));
-    tuv.y *= ratio;
     float frequency = 5.0;
     float amplitude = 25.0;
     float speed = (iTime * 0.75);
@@ -90,12 +106,19 @@ D2D_PS_ENTRY(main)
     float3 layer1 = lerp(c1, c2, smoothstep(-0.3, 0.2, mul(tuv, transpose(f_Rot(radians(-5.0)))).x));
     float3 layer2 = lerp(c3, c4, smoothstep(-0.3, 0.2, mul(tuv, transpose(f_Rot(radians(-5.0)))).x));
     float3 finalComp = lerp(layer1, layer2, smoothstep(0.5, -0.3, tuv.y));
-    if(UseHSVBlending)
+    if(EnableLightWave)
     {
-        return float4(hsv2rgb(finalComp), 1.0);
+        return float4(lightwave(finalComp, UseHSVBlending, uv), 1.0);
     }
     else
     {
-        return float4(finalComp, 1.0);
+        if(UseHSVBlending)
+        {
+            return float4(hsv2rgb(finalComp), 1.0);
+        }
+        else
+        {
+            return float4(finalComp, 1.0);
+        }
     }
 }

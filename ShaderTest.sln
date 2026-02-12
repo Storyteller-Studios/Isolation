@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.8.34511.84
+# Visual Studio Version 18
+VisualStudioVersion = 18.1.11304.174 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShaderTest", "ShaderTest\ShaderTest.csproj", "{B0A93576-A7AF-45E2-95B7-E1A3CC2FC9C8}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaderTest.UWP", "ShaderTest.UWP\ShaderTest.UWP.csproj", "{3B7AA151-73B9-4A8A-8C5F-4C9EE01F71CE}"
 EndProject
 Global
@@ -21,26 +19,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B0A93576-A7AF-45E2-95B7-E1A3CC2FC9C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B0A93576-A7AF-45E2-95B7-E1A3CC2FC9C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B0A93576-A7AF-45E2-95B7-E1A3CC2FC9C8}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{B0A93576-A7AF-45E2-95B7-E1A3CC2FC9C8}.Debug|ARM.Build.0 = Debug|Any CPU
-		{B0A93576-A7AF-45E2-95B7-E1A3CC2FC9C8}.Debug|ARM64.ActiveCfg = Debug|Any CPU
-		{B0A93576-A7AF-45E2-95B7-E1A3CC2FC9C8}.Debug|ARM64.Build.0 = Debug|Any CPU
-		{B0A93576-A7AF-45E2-95B7-E1A3CC2FC9C8}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{B0A93576-A7AF-45E2-95B7-E1A3CC2FC9C8}.Debug|x64.Build.0 = Debug|Any CPU
-		{B0A93576-A7AF-45E2-95B7-E1A3CC2FC9C8}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{B0A93576-A7AF-45E2-95B7-E1A3CC2FC9C8}.Debug|x86.Build.0 = Debug|Any CPU
-		{B0A93576-A7AF-45E2-95B7-E1A3CC2FC9C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B0A93576-A7AF-45E2-95B7-E1A3CC2FC9C8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B0A93576-A7AF-45E2-95B7-E1A3CC2FC9C8}.Release|ARM.ActiveCfg = Release|Any CPU
-		{B0A93576-A7AF-45E2-95B7-E1A3CC2FC9C8}.Release|ARM.Build.0 = Release|Any CPU
-		{B0A93576-A7AF-45E2-95B7-E1A3CC2FC9C8}.Release|ARM64.ActiveCfg = Release|Any CPU
-		{B0A93576-A7AF-45E2-95B7-E1A3CC2FC9C8}.Release|ARM64.Build.0 = Release|Any CPU
-		{B0A93576-A7AF-45E2-95B7-E1A3CC2FC9C8}.Release|x64.ActiveCfg = Release|Any CPU
-		{B0A93576-A7AF-45E2-95B7-E1A3CC2FC9C8}.Release|x64.Build.0 = Release|Any CPU
-		{B0A93576-A7AF-45E2-95B7-E1A3CC2FC9C8}.Release|x86.ActiveCfg = Release|Any CPU
-		{B0A93576-A7AF-45E2-95B7-E1A3CC2FC9C8}.Release|x86.Build.0 = Release|Any CPU
 		{3B7AA151-73B9-4A8A-8C5F-4C9EE01F71CE}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{3B7AA151-73B9-4A8A-8C5F-4C9EE01F71CE}.Debug|Any CPU.Build.0 = Debug|x64
 		{3B7AA151-73B9-4A8A-8C5F-4C9EE01F71CE}.Debug|Any CPU.Deploy.0 = Debug|x64

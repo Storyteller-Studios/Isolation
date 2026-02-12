@@ -1,0 +1,3 @@
+set INCLUDEPATH="%WindowsSdkDir%\Include\%WindowsSDKVersion%\um"
+fxc effect.hlsl /nologo /T lib_4_0 /D D2D_FUNCTION /D D2D_ENTRY=main /Fl effect.fxlib /I %INCLUDEPATH%
+fxc effect.hlsl /nologo /T ps_4_0 /D D2D_FULL_SHADER /D D2D_ENTRY=main /E main /setprivate effect.fxlib /Fo:effect.bin /I %INCLUDEPATH%

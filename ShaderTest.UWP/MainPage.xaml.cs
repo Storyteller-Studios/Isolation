@@ -45,8 +45,7 @@ namespace ShaderTest.UWP
             height = (float)canvas.ActualHeight;
             if (effect != null)
             {
-                effect.Properties["Width"] = width;
-                effect.Properties["Height"] = height;
+                effect.Properties["iResolution"] = new Vector2(width, height);
             }
         }
 
@@ -58,8 +57,7 @@ namespace ShaderTest.UWP
                 IBuffer buffer = await FileIO.ReadBufferAsync(file);
                 var bytes = buffer.ToArray();
                 effect = new PixelShaderEffect(bytes);
-                effect.Properties["Width"] = width;
-                effect.Properties["Height"] = height;
+                effect.Properties["iResolution"] = new Vector2(width, height);
             };
             selectPicture.Click += async (s, e) =>
             {
